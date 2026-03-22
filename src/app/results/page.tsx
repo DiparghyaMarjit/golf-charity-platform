@@ -7,7 +7,7 @@ import { Card, StatCard, LoadingSpinner } from '@/components/UI';
 
 export default function ResultsPage() {
   const [winners, setWinners] = useState<Winner[]>([]);
-  const [stats, setStats] = useState<any>(null);
+  const [stats, setStats] = useState<Awaited<ReturnType<typeof getWinnerStats>> | null>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -131,4 +131,3 @@ export default function ResultsPage() {
     </div>
   );
 }
-                    
