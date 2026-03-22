@@ -1,5 +1,5 @@
 import { supabase } from './supabaseClient';
-import { Draw, DrawParticipant, Winner } from '@/types';
+import { Draw, Winner } from '@/types';
 
 /**
  * Prize pool distribution constants
@@ -195,9 +195,17 @@ export function getMatchCount(
 /**
  * Run draw simulation (doesn't publish results)
  */
+export type SimulatedDrawWinner = { user_id: string; match_type: number };
+
+export type SimulatedDrawResults = {
+  '5-match': SimulatedDrawWinner[];
+  '4-match': SimulatedDrawWinner[];
+  '3-match': SimulatedDrawWinner[];
+};
+
 export async function simulateDraw(
   drawId: string
-): Promise<{ success: boolean; error?: string; results?: any }> {
+): Promise<{ success: boolean; error?: string; results?: SimulatedDrawResults }> {
   try {
     // Get draw details
     const { data: draw, error: drawError } = await supabase
@@ -220,12 +228,11 @@ export async function simulateDraw(
       return { success: false, error: partError.message };
     }
 
-    // Calculate winners
     const winningNumbers = draw.winning_numbers as number[];
-    const winners = {
-      '5-match': [] as any[],
-      '4-match': [] as any[],
-      '3-match': [] as any[],
+    const winners: SimulatedDrawResults = {
+      '5-match': [],
+      '4-match': [],
+      '3-match': [],
     };
 
     participants?.forEach(participant => {
@@ -235,7 +242,8 @@ export async function simulateDraw(
       );
 
       if (matchCount >= 3) {
-        winners[`${matchCount}-match`].push({
+        const key = `${matchCount}-match` as keyof SimulatedDrawResults;
+        winners[key].push({
           user_id: participant.user_id,
           match_type: matchCount,
         });
@@ -295,7 +303,16 @@ export async function publishDrawResults(
 
     // Calculate winners and insert winner records
     const winningNumbers = draw.winning_numbers as number[];
-    const winnersToInsert: any[] = [];
+
+    type WinnerInsert = {
+      user_id: string;
+      draw_id: string;
+      match_type: number;
+      prize_amount: number;
+      verification_status: 'pending';
+      payment_status: 'pending';
+    };
+    const winnersToInsert: WinnerInsert[] = [];
 
     participants.forEach(participant => {
       const matchCount = getMatchCount(

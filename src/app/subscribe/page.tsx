@@ -87,7 +87,11 @@ export default function SubscribePage() {
                 <Card key={plan} title={`${details.name} Plan`}>
                   <p className="text-gray-700">Price: ${details.price.toFixed(2)}</p>
                   <p className="text-sm text-gray-500">Interval: {details.interval}</p>
-                  {details.savings && <p className="text-sm text-green-600">Save {details.savings}</p>}
+                  {'savings' in details && (
+  <p className="text-sm text-green-600">
+    Save {details.savings}
+  </p>
+)}
                   <Button className="w-full mt-4" onClick={() => handleSubscribe(plan)}>
                     Subscribe Now
                   </Button>

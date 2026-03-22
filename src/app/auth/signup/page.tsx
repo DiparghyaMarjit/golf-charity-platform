@@ -1,14 +1,14 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { Suspense, useEffect, useState } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import { signUp } from '@/lib/auth';
 import { getAllCharities } from '@/lib/charities';
 import { Charity } from '@/types';
-import { Input, Button, Select, Alert, LoadingSpinner } from '@/components/UI';
+import { Input, Button, Alert, LoadingSpinner } from '@/components/UI';
 
-export default function SignupPage() {
+function SignupPageContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const [charities, setCharities] = useState<Charity[]>([]);
@@ -283,5 +283,13 @@ export default function SignupPage() {
         </p>
       </div>
     </div>
+  );
+}
+
+export default function SignupPage() {
+  return (
+    <Suspense fallback={<LoadingSpinner />}>
+      <SignupPageContent />
+    </Suspense>
   );
 }

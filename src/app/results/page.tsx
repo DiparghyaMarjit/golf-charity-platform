@@ -131,14 +131,4 @@ export default function ResultsPage() {
     </div>
   );
 }
-          key={i}
-          className="border p-3 mb-2 flex justify-between"
-        >
-          <span>{w.users?.name}</span>
-          <span>Match: {w.match_count}</span>
-          <span>₹{w.prize_amount}</span>
-        </div>
-      ))}
-    </div>
-  );
-}
+                    
